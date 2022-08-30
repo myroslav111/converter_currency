@@ -3,12 +3,23 @@ import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
 import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
-import { useState, useEffect } from 'react';
+import { currencyObj } from '../../currency/currency';
+import Autocomplete from '@mui/material/Autocomplete';
+import { useState } from 'react';
+import CircularProgress from '@mui/material/CircularProgress';
 
-function Form({}) {
+const curr = Object.keys(currencyObj);
+
+function Form({ currency }) {
   const [userCurrencyFrom, setUserCurrencyFrom] = useState('');
   const [userCurrencyTo, setUserCurrencyTo] = useState('');
-  const handleSubmit = () => {
+  const [amount, setAmount] = useState('');
+  const [data, setData] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+
+  // console.log(currency);
+  const handleSubmit = async () => {
+    setIsLoading(true);
     var myHeaders = new Headers();
     myHeaders.append('apikey', 'Bqf0jgud3HsN3E435u3LbG7qgqDyjvOj');
 
@@ -17,32 +28,64 @@ function Form({}) {
       redirect: 'follow',
       headers: myHeaders,
     };
-    fetch(
-      `https://api.apilayer.com/exchangerates_data/convert?to=UAH&from=USD&amount=${100}`,
-      requestOptions
-    )
-      .then(response => response.text())
-      .then(result => console.log(result))
-      .catch(error => console.log('error', error));
+
+    if (currency !== '') {
+      await fetch(
+        `https://api.apilayer.com/exchangerates_data/convert?to=UAH&from=${userCurrencyFrom}&amount=${amount}`,
+        requestOptions
+      )
+        .then(response => {
+          return response.text();
+        })
+        .then(result => {
+          setData(JSON.parse(result));
+        })
+        .catch(error => console.log('error', error))
+        .finally(() => {
+          setIsLoading(false);
+        });
+    } else {
+      await fetch(
+        `https://api.apilayer.com/exchangerates_data/convert?to=${userCurrencyTo}&from=${userCurrencyFrom}&amount=${amount}`,
+        requestOptions
+      )
+        .then(response => {
+          return response.text();
+        })
+        .then(result => setData(JSON.parse(result)))
+        .catch(error => console.log('error', error))
+        .finally(() => {
+          setIsLoading(false);
+        });
+    }
   };
+
   return (
     <Box
       sx={{
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
+        padding: 5,
         '& .MuiTextField-root': { width: '25ch' },
       }}
     >
-      <TextField
-        sx={{
-          display: 'flex',
-          margin: '10px',
-        }}
-        id="outlined-name"
-        label="Name"
-        // value={name}
-        // onChange={e => setUserCurrencyFrom(e.target.event)}
+      <Autocomplete
+        disablePortal
+        id="combo-box-demo"
+        options={curr}
+        onChange={e => setUserCurrencyFrom(e.target.textContent)}
+        renderInput={params => <TextField {...params} label="from" />}
+      />
+      <Autocomplete
+        disablePortal
+        id="combo-box-demo"
+        options={curr}
+        onChange={e => setUserCurrencyTo(e.target.textContent)}
+        sx={{ marginBottom: 3, marginTop: 3 }}
+        renderInput={params => (
+          <TextField {...params} label={currency !== '' ? currency : 'to'} />
+        )}
       />
       <TextField
         sx={{
@@ -50,25 +93,25 @@ function Form({}) {
           margin: '10px',
         }}
         id="outlined-name"
-        label="Name"
-        // value={name}
-        // onChange={handleChange}
-      />
-      <TextField
-        sx={{
-          display: 'flex',
-          margin: '10px',
-        }}
-        id="outlined-name"
-        label="Name"
-        // value={name}
-        // onChange={handleChange}
+        label="sum"
+        value={amount}
+        onChange={e => setAmount(e.target.value)}
       />
       <Stack spacing={2} direction="row">
-        <Button variant="contained" onClick={handleSubmit}>
-          Go
-        </Button>
+        {isLoading ? (
+          <Box sx={{ display: 'flex' }}>
+            <CircularProgress />
+          </Box>
+        ) : (
+          <Button variant="contained" onClick={handleSubmit}>
+            Go
+          </Button>
+        )}
       </Stack>
+      <p>
+        {data ? Number.parseInt(data.result) : 0} -{' '}
+        {data ? userCurrencyTo || 'UAH' : currency || 'currency'}
+      </p>
     </Box>
   );
 }
