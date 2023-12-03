@@ -31,7 +31,7 @@ function Form({ currency }) {
 
     if (currency !== '') {
       await fetch(
-        `https://api.apilayer.com/exchangerates_data/convert?to=UAH&from=${userCurrencyFrom}&amount=${amount}`,
+        `https://api.apilayer.com/exchangerates_data/convert?to=${userCurrencyTo}&from=${userCurrencyFrom}&amount=${amount}`,
         requestOptions
       )
         .then(response => {
@@ -84,7 +84,8 @@ function Form({ currency }) {
         onChange={e => setUserCurrencyTo(e.target.textContent)}
         sx={{ marginBottom: 3, marginTop: 3 }}
         renderInput={params => (
-          <TextField {...params} label={currency !== '' ? currency : 'to'} />
+          <TextField {...params} label="to" />
+          // label={currency !== '' ? currency : 'to'}
         )}
       />
       <TextField
@@ -103,7 +104,13 @@ function Form({ currency }) {
             <CircularProgress />
           </Box>
         ) : (
-          <Button variant="contained" onClick={handleSubmit}>
+          <Button
+            disabled={
+              userCurrencyFrom && userCurrencyTo && amount ? false : true
+            }
+            variant="contained"
+            onClick={handleSubmit}
+          >
             Go
           </Button>
         )}
