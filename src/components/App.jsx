@@ -2,6 +2,7 @@ import Home from 'page/Home/Home';
 import { useEffect, useState } from 'react';
 import { styled } from '@mui/material/styles';
 import Box from '@mui/material/Box';
+import { apiKey } from '../currency/currency';
 
 const Div = styled('div')(({ theme }) => ({
   ...theme.typography.button,
@@ -20,9 +21,9 @@ export const App = () => {
         const latitude = position?.coords?.latitude;
         const longitude = position?.coords?.longitude;
         // console.log(navigator);
-        const apiKey = '14fe4a9bc173447d879daa5a9a91e05b';
-        const urlPosition = `https://api.opencagedata.com/geocode/v1/json?q=${latitude}+${longitude}&key=${apiKey}&language=en`;
 
+        const urlPosition = `https://api.opencagedata.com/geocode/v1/json?q=${latitude}+${longitude}&key=${apiKey}&language=en`;
+        console.log(urlPosition);
         fetch(urlPosition)
           .then(response => {
             if (!response.ok) {

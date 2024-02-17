@@ -4,6 +4,7 @@ import TextField from '@mui/material/TextField';
 import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
 import { currencyObj } from '../../currency/currency';
+import { APIKEY } from '../../currency/currency';
 import Autocomplete from '@mui/material/Autocomplete';
 import { useState } from 'react';
 import CircularProgress from '@mui/material/CircularProgress';
@@ -21,20 +22,22 @@ function Form({ currency }) {
   const handleSubmit = async () => {
     setIsLoading(true);
     var myHeaders = new Headers();
-    myHeaders.append('apikey', 'Bqf0jgud3HsN3E435u3LbG7qgqDyjvOj');
+
+    myHeaders.append('apikey', APIKEY);
 
     var requestOptions = {
       method: 'GET',
       redirect: 'follow',
       headers: myHeaders,
     };
-
+    // console.log('start');
     if (currency !== '') {
       await fetch(
         `https://api.apilayer.com/exchangerates_data/convert?to=${userCurrencyTo}&from=${userCurrencyFrom}&amount=${amount}`,
         requestOptions
       )
         .then(response => {
+          // console.log(response);
           return response.text();
         })
         .then(result => {

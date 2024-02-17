@@ -1,3 +1,5 @@
+export const APIKEY = 'HXlSfcQ6snLpsaL3RH8iyK5WR5KPrSVR';
+export const apiKey = '14fe4a9bc173447d879daa5a9a91e05b';
 export const currencyObj = {
   AED: 'United Arab Emirates Dirham',
   AFN: 'Afghan Afghani',
